@@ -1,5 +1,12 @@
-﻿using CQRS.Boilerplate.Application.Common.Interfaces;
+﻿using CQRS.Boilerplate.Application.Commands.Configuration;
+using CQRS.Boilerplate.Application.Common.Interfaces;
+using CQRS.Boilerplate.Domain.Contracts;
+using CQRS.Boilerplate.Infrastructure.Configuration;
+using CQRS.Boilerplate.Infrastructure.DBContexts;
 using CQRS.Boilerplate.Infrastructure.Services;
+using CQRS.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -14,41 +21,31 @@ namespace CQRS.Boilerplate.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddSingleton<IConfigurationManager, AppSettingsConfigurationManager>();
+            services.AddTransient<IDomainEventService, DomainEventService>();
+            services.AddTransient<IUserClaimsPrincipalFactory<ApplicationUser>, AppClaimsPrincipalFactory>();
 
-            //if (configuration.GetValue<bool>("UseInMemoryDatabase"))
-            //{
-            //    services.AddDbContext<ApplicationDbContext>(options =>
-            //        options.UseInMemoryDatabase("CleanArchitectureDb"));
-            //}
-            //else
-            //{
-            //    services.AddDbContext<ApplicationDbContext>(options =>
-            //        options.UseSqlServer(
-            //            configuration.GetConnectionString("DefaultConnection"),
-            //            b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
-            //}
+            services.AddIdentity<ApplicationUser, ApplicationRole>(config =>
+            {
+                config.SignIn.RequireConfirmedEmail = false;
 
-            //services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
-
-            services.AddScoped<IDomainEventService, DomainEventService>();
-
-            //services
-            //    .AddDefaultIdentity<ApplicationUser>()
-            //    .AddRoles<IdentityRole>()
-            //    .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            //services.AddIdentityServer()
-            //    .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+            }).AddRoles<ApplicationRole>()
+            .AddEntityFrameworkStores<CommandDbContext>()
+            .AddDefaultTokenProviders();
 
             //services.AddTransient<IDateTime, DateTimeService>();
-            //services.AddTransient<IIdentityService, IdentityService>();
-            //services.AddTransient<ICsvFileBuilder, CsvFileBuilder>();
+            services.AddTransient<IIdentityService, IdentityService>();
 
-            //services.AddAuthentication()
-            //    .AddIdentityServerJwt();
+            services.AddDbContext<CommandDbContext>(options => options.UseSqlServer(new AppSettingsConfigurationManager(configuration).DBConnectionString), ServiceLifetime.Transient);
 
-            //services.AddAuthorization(options =>
-            //    options.AddPolicy("CanPurge", policy => policy.RequireRole("Administrator")));
+            services.AddDbContext<QueryDbContext>(options => options.UseSqlServer(new AppSettingsConfigurationManager(configuration).DBConnectionString), ServiceLifetime.Transient);
+
+            services.AddTransient<ICommandDBContext, CommandDbContext>();
+            services.AddTransient<IQueryDbContext, QueryDbContext>();
+
+            var serviceProvider = services.BuildServiceProvider();
+            var commandContext = serviceProvider.GetService<ICommandDBContext>();
+            commandContext.EnsureDbCreated();
 
             return services;
         }

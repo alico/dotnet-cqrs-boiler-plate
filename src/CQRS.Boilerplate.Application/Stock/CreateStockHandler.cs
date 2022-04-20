@@ -14,12 +14,7 @@ namespace CQRS.Boilerplate.Application.Stock.Commands
 
         public async Task<Unit> Handle(CreateStockCommand command, CancellationToken cancellationToken)
         {
-            var stock = new  Domain.Models.Stock()
-            {
-               ProductId = command.ProductId,
-               Quantity = command.Quantity
-            };
-
+            var stock = new Domain.Models.Stock(command.ProductId, command.Quantity);
             await _context.Stocks.AddAsync(stock, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 

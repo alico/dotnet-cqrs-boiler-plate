@@ -11,12 +11,10 @@ namespace CQRS.Boilerplate.Application.Order.EventHandlers
 {
     public class ProductCreatedDomainEventHandler : INotificationHandler<DomainEventNotification<ProductCreatedEvent>>
     {
-        private readonly ICommandDBContext _context;
         private readonly ISender _sender;
 
-        public ProductCreatedDomainEventHandler(ICommandDBContext context, ISender sender)
+        public ProductCreatedDomainEventHandler( ISender sender)
         {
-            _context = context;
             _sender = sender;
         }
 

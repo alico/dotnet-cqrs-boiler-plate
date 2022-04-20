@@ -14,11 +14,8 @@ namespace CQRS.Boilerplate.Application.Product.Commands
 
         public async Task<Guid> Handle(CreateProductCommand command, CancellationToken cancellationToken)
         {
-            var product = new  Domain.Models.Product()
-            {
-                Name = command.Name,
-                SKU = command.SKU,
-            };
+            var product = new Domain.Models.Product(command.Name, command.SKU);
+           
 
             product.DomainEvents.Add(new Domain.Events.ProductCreatedEvent(product, command.Quantity));
             await _context.Products.AddAsync(product, cancellationToken);

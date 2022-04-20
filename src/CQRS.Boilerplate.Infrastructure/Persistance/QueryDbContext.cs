@@ -12,21 +12,17 @@ using System.Threading.Tasks;
 
 namespace CQRS.Boilerplate.Infrastructure.DBContexts
 {
-    public class QueryDbContext : ApplicationDbContext<QueryDbContext>, IQueryDbContext
+    public class QueryDbContext : BaseDataContext, IQueryDbContext
     {
         public QueryDbContext(IConfigurationManager configurationManager) : base(configurationManager)
-        {
-            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-
-        }
-        public QueryDbContext(DbContextOptions<QueryDbContext> options) : base(options)
         {
             ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_configurationManager.PrimaryDBConnectionString).EnableSensitiveDataLogging();
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.UseSqlServer(_configurationManager.DBConnectionString).EnableSensitiveDataLogging();
         }
     }
 }

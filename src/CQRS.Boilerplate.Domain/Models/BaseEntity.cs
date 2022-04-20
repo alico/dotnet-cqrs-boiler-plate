@@ -15,7 +15,6 @@ namespace CQRS.Boilerplate.Domain.Models
 
     public abstract class BaseEntity
     {
-        public List<DomainEvent> DomainEvents { get; set; } = new List<DomainEvent>();
         public virtual DateTime? LastModifyDate { get; set; }
 
         public virtual DateTime CreationDate { get; set; }

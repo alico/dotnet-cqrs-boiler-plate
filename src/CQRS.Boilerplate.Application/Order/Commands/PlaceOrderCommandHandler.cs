@@ -20,8 +20,7 @@ namespace CQRS.Boilerplate.Application.Order.Commands
 
         public async Task<Guid> Handle(PlaceOrderCommand command, CancellationToken cancellationToken)
         {
-            var order = new Domain.Models.Order(command.ProductId, command.CustomerId, command.Quantity, OrderStatus.Placed);
-            order.DomainEvents.Add(new Domain.Events.OrderPlacedEvent(order));
+            var order = new Domain.Models.Order(command.ProductId, command.CustomerId, command.Quantity, (short)OrderStatus.Placed);
             await _context.Orders.AddAsync(order, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 

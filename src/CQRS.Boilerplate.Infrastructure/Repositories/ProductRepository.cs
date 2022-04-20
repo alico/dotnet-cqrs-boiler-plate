@@ -15,9 +15,5 @@ namespace CQRS.Boilerplate.Infrastructure.Repositories
         {
             _databaseContext = databaseContext;
         }
-
-
-
-
     }
 }

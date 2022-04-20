@@ -1,5 +1,8 @@
+using AutoMapper;
 using CQRS.Boilerplate.Application.Commands;
+using CQRS.Boilerplate.Application.Common.Models;
 using CQRS.Boilerplate.Application.Product.Commands;
+using CQRS.Boilerplate.Application.Product.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,9 +10,29 @@ namespace CQRS.Boilerplate.API.Controllers
 {
     public class ProductController : BaseController
     {
-        public ProductController(ILogger<ProductController> logger, IMediator mediator) : base(logger, mediator)
+        public ProductController(ILogger<ProductController> logger, IMediator mediator, IMapper mapper) : base(logger, mediator, mapper)
         {
 
+        }
+
+        /// <summary>
+        /// Gets all products with pagination
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{pageNumber}/{pageSize}")]
+        [ProducesResponseType(typeof(PaginatedListResponse<ProductDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PaginatedListResponse<ProductDto>>> Get(CancellationToken cancellationToken, int pageNumber = 1, int pageSize = 10)
+        {
+            var query = new GetProductsQuery(pageNumber, pageSize);
+            var result = await _mediator.Send(query, cancellationToken);
+            var response = new PaginatedListResponse<ProductDto>()
+            {
+                Items = result.Items
+            };
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -17,21 +40,13 @@ namespace CQRS.Boilerplate.API.Controllers
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [Route("")]
-        [HttpPost]
-        [ProducesResponseType(typeof(AddNewProductResponse),StatusCodes.Status200OK)]
-        public async Task<ActionResult<AddNewProductResponse>> Get(CancellationToken cancellationToken)
+        [HttpPut]
+        [ProducesResponseType(typeof(CreateProductResponse),StatusCodes.Status200OK)]
+        public async Task<ActionResult<CreateProductResponse>> Put(CreateProductRequest request, CancellationToken cancellationToken)
         {
-            AddNewProductRequest requestModel = new AddNewProductRequest();
-            var command = new CreateProductCommand()
-            {
-                Name = "Test",
-                Quantity = new Random().Next(1, 10),
-                SKU = new Random().Next(1000, 10000).ToString(),
-            };
-
+            var command = _mapper.Map<CreateProductCommand>(request);
             var productId = await _mediator.Send(command, cancellationToken);
-            var response = new AddNewProductResponse()
+            var response = new CreateProductResponse()
             {
                 Id = productId
             };

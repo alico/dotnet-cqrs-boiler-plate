@@ -1,4 +1,5 @@
 ﻿using CQRS.Boilerplate.Application.Common.Models;
+using CQRS.Boilerplate.Application.Stock.Commands;
 using CQRS.Boilerplate.Domain.Contracts;
 using CQRS.Boilerplate.Domain.Enums;
 using CQRS.Boilerplate.Domain.Events;
@@ -8,28 +9,22 @@ namespace CQRS.Boilerplate.Application.Order.EventHandlers
 {
     public class OrderPlacedDomainEventHandler : INotificationHandler<DomainEventNotification<OrderPlacedEvent>>
     {
-        private readonly ICommandDBContext _context;
-        public OrderPlacedDomainEventHandler(ICommandDBContext context)
+        private readonly ISender _sender;
+        public OrderPlacedDomainEventHandler(ISender sender)
         {
-            _context = context;
+            _sender = sender;
         }
 
         public async Task Handle(DomainEventNotification<OrderPlacedEvent> notification, CancellationToken cancellationToken)
         {
             var order = notification.DomainEvent.Order;
-            var currentStock = await _context.Stocks.FirstOrDefaultAsync(x => x.ProductId == order.ProductId);
-            
-            if(currentStock is null || order.Quantity > currentStock.Quantity)
+            var updateStockCommand = new UpdateStockCommand()
             {
-                order.Status = (short)OrderStatus.Declined;
-            }
-            else
-            {
-                currentStock.Quantity -= order.Quantity;
-                order.Status = (short)OrderStatus.Approved;
-            }
+                ProductId = notification.DomainEvent.Order.ProductId,
+                Quantity = notification.DomainEvent.Order.Quantity,
+            };
 
-            await _context.SaveChangesAsync(cancellationToken);
+            await _sender.Send(updateStockCommand);
         }
     }
 }

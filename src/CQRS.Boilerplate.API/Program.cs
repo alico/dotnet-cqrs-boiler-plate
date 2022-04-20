@@ -1,6 +1,6 @@
-using CQRS.Boilerplate.Domain.Contracts;
 using CQRS.Boilerplate.Infrastructure;
 using CQRS.Boilerplate.Application;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,15 +9,11 @@ var services = builder.Services;
 services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
-services.AddApplicationDependencies();
+services.AddAPI();
 services.AddApplication();
 services.AddInfrastructure(builder.Configuration);
 services.AddSwaggerGen();
-
 var app = builder.Build();
-
-var context = app.Services.GetService<IQueryDbContext>();
-context.EnsureDbCreated();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

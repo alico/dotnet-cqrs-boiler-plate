@@ -4,6 +4,7 @@ using CQRS.Boilerplate.Application.Product.Queries;
 using CQRS.Boilerplate.Domain.Contracts;
 using CQRS.Boilerplate.Domain.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using CQRS.Boilerplate.Application.Common.Mappings;
 
@@ -21,7 +22,7 @@ namespace CQRS.Boilerplate.Application.Product.Commands
 
         public async Task<PaginatedList<ProductDto>> Handle(GetProductsQuery query, CancellationToken cancellationToken)
         {
-            return await _context.Products
+            return await _context.Products.Include(x=>x.Stock)
             .OrderBy(x => x.Name)
             .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(query.PageNumber, query.PageSize);

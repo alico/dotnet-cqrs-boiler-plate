@@ -1,5 +1,7 @@
+using AutoMapper;
 using CQRS.Boilerplate.Application.Commands;
 using CQRS.Boilerplate.Application.Customer.Commands;
+using CQRS.Boilerplate.Application.Order.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,32 +9,25 @@ namespace CQRS.Boilerplate.API.Controllers
 {
     public class OrderController : BaseController
     {
-        public OrderController(ILogger<CustomerController> logger, IMediator mediator) : base(logger, mediator)
+        public OrderController(ILogger<CustomerController> logger, IMediator mediator, IMapper mapper) : base(logger, mediator, mapper)
         {
 
         }
 
         /// <summary>
-        /// Places order
+        /// Places an order
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [Route("")]
-        [HttpPost]
+        [HttpPut]
         [ProducesResponseType(typeof(PlaceOrderResponse),StatusCodes.Status200OK)]
-        public async Task<ActionResult<PlaceOrderResponse>> Get(CancellationToken cancellationToken)
+        public async Task<ActionResult<PlaceOrderResponse>> Get(PlaceOrderRequest request, CancellationToken cancellationToken)
         {
-            var requestModel = new PlaceOrderRequest();
-            var command = new CreateCustomerCommand()
+            var command = _mapper.Map<PlaceOrderCommand>(request);
+            var orderId = await _mediator.Send(command, cancellationToken);
+            var response = new PlaceOrderResponse()
             {
-                Name = "Test",
-                Email = $"{new Random().Next(1000, 10000)}@email.com",
-            };
-
-            var customerId = await _mediator.Send(command, cancellationToken);
-            var response = new AddNewCustomerResponse()
-            {
-                Id = customerId
+                Id = orderId
             };
 
             return Created(string.Empty, response);

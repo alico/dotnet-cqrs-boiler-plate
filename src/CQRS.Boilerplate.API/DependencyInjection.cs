@@ -7,15 +7,15 @@ using CQRS.Boilerplate.Domain.Contracts;
 using CQRS.Boilerplate.Application.Product.Commands;
 using CQRS.Boilerplate.API.Services;
 using CQRS.Boilerplate.Application.Common.Interfaces;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplicationDependencies(this IServiceCollection services)
+    public static IServiceCollection AddAPI(this IServiceCollection services)
     {
-        services.AddSingleton<IConfigurationManager, AppSettingsConfigurationManager>();
-        services.AddTransient<IQueryDbContext, QueryDbContext>();
+        services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
-        services.AddTransient<ICommandDBContext, CommandDbContext>();
+        services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
         return services;
     }

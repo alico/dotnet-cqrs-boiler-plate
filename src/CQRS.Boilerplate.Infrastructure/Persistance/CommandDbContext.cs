@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace CQRS.Boilerplate.Infrastructure.DBContexts
 {
-    public class CommandDbContext : ApplicationDbContext<CommandDbContext>, ICommandDBContext
+    public class CommandDbContext : BaseDataContext, ICommandDBContext
     {
         private readonly IDomainEventService _domainEventService;
         public CommandDbContext(IConfigurationManager configurationManager,
@@ -24,14 +24,10 @@ namespace CQRS.Boilerplate.Infrastructure.DBContexts
             _domainEventService = domainEventService;
         }
 
-        public CommandDbContext(DbContextOptions<CommandDbContext> options) : base(options)
-        {
-            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_configurationManager.SecondaryDBConnectionString).EnableSensitiveDataLogging();
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.UseSqlServer(_configurationManager.DBConnectionString).EnableSensitiveDataLogging();
         }
 
         public async override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

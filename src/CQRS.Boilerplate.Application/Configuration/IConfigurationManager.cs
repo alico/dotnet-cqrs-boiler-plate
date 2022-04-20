@@ -8,8 +8,6 @@ namespace CQRS.Boilerplate.Application.Commands.Configuration
 {
     public interface IConfigurationManager
     {
-        public string PrimaryDBConnectionString { get; }
-        public string SecondaryDBConnectionString { get; }
-
+        public string DBConnectionString { get; }
     }
 }

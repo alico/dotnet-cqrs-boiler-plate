@@ -1,14 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-public record AddNewProductRequest
+public record GetProductListItemResponse
 {
-    [Required]
-    [StringLength(50)]
+    public Guid Id { get; set; }
     public string Name { get; init; }
-
-    [Required]
-    [StringLength(100)]
     public string SKU { get; init; }
-
-    [Required]
     public int Quantity { get; init; }
 }

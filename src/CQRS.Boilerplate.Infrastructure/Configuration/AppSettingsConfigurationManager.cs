@@ -20,8 +20,7 @@ namespace CQRS.Boilerplate.Infrastructure.Configuration
 
         public EnvironmentType EnvironmentType => (EnvironmentType)_configuration.GetValue<int>("ApplicationSettings:Environment");
 
-        public string PrimaryDBConnectionString => _configuration.GetValue<string>("ApplicationSettings:PrimaryDBConnectionString");
-        public string SecondaryDBConnectionString => _configuration.GetValue<string>("ApplicationSettings:SecondaryDBConnectionString");
+        public string DBConnectionString => _configuration.GetValue<string>("ApplicationSettings:DBConnectionString");
 
     }
 }

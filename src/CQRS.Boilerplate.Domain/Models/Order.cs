@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CQRS.Boilerplate.Domain.Models
 {
-    public class Order : BaseEntity<Guid>
+    public class Order : BaseEntity<Guid>, IHasDomainEvent
     {
         public Guid ProductId { get; set; }
         public Guid CustomerId { get; set; }
@@ -18,17 +18,17 @@ namespace CQRS.Boilerplate.Domain.Models
 
         public Product Product { get; set; }
         public Customer Customer { get; set; }
+        public List<DomainEvent> DomainEvents { get; set; } = new List<DomainEvent>();
 
-        public Order()
-        {
-
-        }
-        public Order(Guid productId, Guid customerId, int quantity, OrderStatus status)
+        public Order(Guid productId, Guid customerId, int quantity, short status)
         {
             ProductId = productId;
             CustomerId = customerId;
             Quantity = quantity;
-            Status = (short)status;
+            Status = status;
+
+            if(status == (short)OrderStatus.Placed)
+                DomainEvents.Add(new Domain.Events.OrderPlacedEvent(this));
         }
     }
 }

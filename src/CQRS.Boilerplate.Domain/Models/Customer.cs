@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CQRS.Boilerplate.Domain.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CQRS.Boilerplate.Domain.Models
 {
-    public class Customer : BaseEntity<Guid>
+    public class Customer : BaseEntity<Guid>, IHasDomainEvent
     {
         [StringLength(50)]
         public string Name { get; set; }
@@ -17,6 +18,8 @@ namespace CQRS.Boilerplate.Domain.Models
         public string Email { get; set; }
 
         public IList<Order> Orders { get; set; }
+
+        public List<DomainEvent> DomainEvents { get; set; } = new List<DomainEvent>();
 
         public Customer()
         {

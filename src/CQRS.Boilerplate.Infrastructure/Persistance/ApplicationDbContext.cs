@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace CQRS.Boilerplate.Infrastructure.DBContexts
 {
-    public abstract class ApplicationDbContext<T> : DbContext, ICommandDBContext where T : DbContext
+    public abstract class ApplicationDbContext<T> : DbContext, IDbContext where T : DbContext
     {
         protected readonly IConfigurationManager _configurationManager;
         public ApplicationDbContext(IConfigurationManager configurationManager)

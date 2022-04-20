@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-public record AddNewCustomerRequest
+public record CreateProductRequest
 {
     [Required]
     [StringLength(50)]
@@ -7,5 +7,8 @@ public record AddNewCustomerRequest
 
     [Required]
     [StringLength(100)]
-    public string Email { get; init; }
+    public string SKU { get; init; }
+
+    [Required]
+    public int Quantity { get; init; }
 }
